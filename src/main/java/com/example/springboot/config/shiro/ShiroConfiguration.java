@@ -1,7 +1,6 @@
 package com.example.springboot.config.shiro;
 
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -21,15 +20,45 @@ public class ShiroConfiguration {
 
     private static Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
 
+    /**
+     * 密码校验规则HashedCredentialsMatcher
+     * 这个类是为了对密码进行编码的 ,
+     * 防止密码在数据库里明码保存 , 当然在登陆认证的时候 ,
+     * 这个类也负责对form里输入的密码进行编码
+     * 处理认证匹配处理器：如果自定义需要实现继承HashedCredentialsMatcher
+     */
+    /*@Bean("hashedCredentialsMatcher")
+    public HashedCredentialsMatcher hashedCredentialsMatcher() {
+        HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
+        //指定加密方式为MD5
+        credentialsMatcher.setHashAlgorithmName("MD5");
+        //加密次数
+        credentialsMatcher.setHashIterations(1);
+        credentialsMatcher.setStoredCredentialsHexEncoded(true);
+        return credentialsMatcher;
+    }
+
+    @Bean("authRealm")
+    @DependsOn("lifecycleBeanPostProcessor")//可选hashedCredentialsMatcher
+    public ShiroRealmImpl authRealm() {
+        ShiroRealmImpl authRealm = new ShiroRealmImpl();
+        authRealm.setAuthorizationCachingEnabled(false);
+        authRealm.setCredentialsMatcher(hashedCredentialsMatcher());
+        return authRealm;
+    }*/
+
     @Bean
     public Realm getShiroRealm() {
         return new ShiroRealmImpl();
     }
 
+
     @Bean(name = "securityManager")
     public DefaultWebSecurityManager getDefaultWebSecurityManager() {
+        MemoryConstrainedCacheManager cacheManager = new MemoryConstrainedCacheManager();
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
         defaultWebSecurityManager.setRealm(getShiroRealm());
+        defaultWebSecurityManager.setCacheManager(cacheManager);
         return defaultWebSecurityManager;
     }
 
@@ -37,7 +66,7 @@ public class ShiroConfiguration {
     public AuthorizationAttributeSourceAdvisor getAuthorizationAttributeSourceAdvisor() {
         AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
         authorizationAttributeSourceAdvisor.setSecurityManager(getDefaultWebSecurityManager());
-        return new AuthorizationAttributeSourceAdvisor();
+        return authorizationAttributeSourceAdvisor;
     }
 
     @Bean
@@ -51,6 +80,8 @@ public class ShiroConfiguration {
     public LifecycleBeanPostProcessor getLifecycleBeanPostProcessor() {
         return new LifecycleBeanPostProcessor();
     }
+
+
 
     @Bean(name = "shiroFilter")
     public ShiroFilterFactoryBean getShiroFilterFactoryBean() {

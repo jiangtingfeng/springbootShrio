@@ -10,16 +10,17 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Arrays;
-
+/*
+ *功能描述   可以在这个类中进行权限的配置
+ *author jtf
+ *@date 2020/1/7/007
+ *@return
+ */
 public class ShiroRealmImpl extends AuthorizingRealm{
 
     @Autowired
     private UserService userService;
-
-
-
     //验证授权信息
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
@@ -29,7 +30,6 @@ public class ShiroRealmImpl extends AuthorizingRealm{
         if(null != roles && roles.length() > 0) {
             simpleAuthorizationInfo.addRoles(Arrays.asList(roles.split(",")));
         }
-
         return simpleAuthorizationInfo;
     }
 
@@ -43,11 +43,9 @@ public class ShiroRealmImpl extends AuthorizingRealm{
         String name = usernamePasswordToken.getUsername();
         String password = usernamePasswordToken.getPassword() != null ? new String(usernamePasswordToken.getPassword()) : null;
         User user = userService.isExist(name, password);
-
         if (null == user) {
             return null;
         }
-
-        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+        return new SimpleAuthenticationInfo(user, user.getPassword(),getName());
     }
 }

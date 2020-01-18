@@ -24,6 +24,7 @@ public class User implements Serializable {
     private String name;
     private String password;
     private String description;
+    private String salt;
     @TableField("startTime")
     private LocalDateTime startTime;
     @TableField("endTime")

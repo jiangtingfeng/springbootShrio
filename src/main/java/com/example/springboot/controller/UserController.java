@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author jiangtingfeng
@@ -71,8 +68,15 @@ public class UserController {
     public String register(@RequestParam("name") String name,@RequestParam("password") String password) throws Exception {
         User user = new User();
         user.setName(name);
-        user.setPassword(password);
-        user.setDescription("cest1");
+        //获取一个随机数然后拼接到password后
+        StringBuilder stringBuilder = new StringBuilder();
+        char[] c = new char[]{'0','1','2','3','4','5','6','7','8','9'};
+        for (int i = 0; i < 3; i++) {
+            stringBuilder.append(c[new Random().nextInt(c.length)]);
+        }
+        user.setSalt(stringBuilder.toString());
+        String psw = Md5Util.md5ToLower(password+stringBuilder.toString());
+        user.setPassword(psw);
         userService.save(user);
         return "login";
     }

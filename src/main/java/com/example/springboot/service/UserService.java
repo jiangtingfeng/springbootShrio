@@ -32,12 +32,13 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     public User isExist(String name, String password) throws Exception {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        String psw = Md5Util.md5ToLower(password);
         queryWrapper.eq(!StringUtils.isEmpty(name), "name", name)
-                .eq(!StringUtils.isEmpty(password), "password", password);
+                .eq(!StringUtils.isEmpty(psw), "password", psw);
         List<User> userList = baseMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(userList)) {
             return null;
         }
-        return new User(userList.get(0).getName(), userList.get(0).getPassword(), userList.get(0).getDescription());
+        return new User(name, password, userList.get(0).getDescription());
     }
 }
